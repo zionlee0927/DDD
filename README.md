@@ -8,6 +8,7 @@
 | 도메인 | 설명 | 설계 | 구현 |
 |--------|------|------|------|
 | [ecommerce](./ecommerce/README.md) | 인플루언서 중심 쇼핑몰 — 파트너가 추적 링크로 상품을 추천하고, 구매 귀속 판정 후 커미션을 정산받는 구조 | ✅ 완료 | 🚧 진행 중 |
+| [partner-commission](./partner-commission/README.md) | 파트너 커미션 SaaS — 추천 귀속 판정과 커미션 계산을 API로 제공하는 Headless 서비스 | ✅ 완료 | 미착수 |
 
 ## 설계 프로세스
 
@@ -28,10 +29,12 @@
 
 ```
 ddd/
-├── docs/ddd-theory/    ← DDD 이론 정리 (12개 주제)
-└── ecommerce/          ← 첫 번째 도메인
-    ├── docs/           ← 전략적 설계 산출물 (00~07)
-    └── src/            ← Kotlin + Spring Boot 구현
+├── docs/ddd-theory/        ← DDD 이론 정리 (12개 주제)
+├── ecommerce/              ← 첫 번째 도메인
+│   ├── docs/               ← 전략적 설계 산출물 (00~07)
+│   └── src/                ← Kotlin + Spring Boot 구현
+└── partner-commission/     ← 두 번째 도메인
+    └── docs/               ← 전략적 설계 산출물 (00~07)
 ```
 
 ## 기술 스택
