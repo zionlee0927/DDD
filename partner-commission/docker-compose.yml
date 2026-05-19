@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: partner-commission-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: partner_commission
+      POSTGRES_USER: partner_commission
+      POSTGRES_PASSWORD: partner_commission
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

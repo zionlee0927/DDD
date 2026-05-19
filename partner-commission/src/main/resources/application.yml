@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: partner-commission
+  datasource:
+    url: jdbc:postgresql://localhost:5433/partner_commission
+    driver-class-name: org.postgresql.Driver
+    username: partner_commission
+    password: partner_commission
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
