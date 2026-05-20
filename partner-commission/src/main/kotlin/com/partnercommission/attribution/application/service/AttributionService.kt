@@ -4,8 +4,6 @@ import com.partnercommission.attribution.application.command.ReceiveConversionCo
 import com.partnercommission.attribution.application.port.`in`.ReceiveConversionUseCase
 import com.partnercommission.attribution.domain.aggregate.AttributionDecision
 import com.partnercommission.attribution.domain.aggregate.ConversionEvent
-import com.partnercommission.attribution.domain.event.AttributionDecided
-import com.partnercommission.attribution.domain.event.AttributionFailed
 import com.partnercommission.attribution.domain.repository.AttributionDecisionRepository
 import com.partnercommission.attribution.domain.repository.ConversionEventRepository
 import com.partnercommission.attribution.domain.service.AttributionConfig
@@ -19,7 +17,6 @@ import com.partnercommission.tenant.domain.repository.TenantReadRepository
 import com.partnercommission.tracking.domain.repository.ClickReadRepository
 import com.partnercommission.tracking.domain.repository.ReferralCodeReadRepository
 import com.partnercommission.tracking.domain.repository.TrackingLinkReadRepository
-import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
@@ -33,7 +30,6 @@ class AttributionService(
     private val clickRepository: ClickReadRepository,
     private val trackingLinkRepository: TrackingLinkReadRepository,
     private val referralCodeRepository: ReferralCodeReadRepository,
-    private val eventPublisher: ApplicationEventPublisher,
 ) : ReceiveConversionUseCase {
 
     private val judge = AttributionJudge()
@@ -82,45 +78,25 @@ class AttributionService(
             config = config,
         )
 
-        // 6. AttributionDecision 생성 + 저장
+        // 6. AttributionDecision 생성 (이벤트는 Aggregate 내부에서 등록)
         val decision = when (result) {
-            is AttributionResult.Attributed -> {
-                AttributionDecision.attributed(
-                    tenantId = command.tenantId,
-                    conversionEventId = conversionEvent.id,
-                    partnerId = result.partnerId,
-                    evidence = evidence!!,
-                    strategy = config.strategy,
-                )
-            }
-            is AttributionResult.Unattributed -> {
-                AttributionDecision.unattributed(
-                    tenantId = command.tenantId,
-                    conversionEventId = conversionEvent.id,
-                    strategy = config.strategy,
-                )
-            }
+            is AttributionResult.Attributed -> AttributionDecision.attributed(
+                tenantId = command.tenantId,
+                conversionEventId = conversionEvent.id,
+                partnerId = result.partnerId,
+                evidence = evidence!!,
+                strategy = config.strategy,
+                amount = conversionEvent.amount,
+            )
+            is AttributionResult.Unattributed -> AttributionDecision.unattributed(
+                tenantId = command.tenantId,
+                conversionEventId = conversionEvent.id,
+                strategy = config.strategy,
+            )
         }
-        attributionDecisionRepository.save(decision)
 
-        // 7. 도메인 이벤트 발행
-        when (result) {
-            is AttributionResult.Attributed -> eventPublisher.publishEvent(
-                AttributionDecided(
-                    attributionDecisionId = decision.id,
-                    tenantId = command.tenantId,
-                    partnerId = result.partnerId,
-                    conversionEventId = conversionEvent.id,
-                    amount = conversionEvent.amount,
-                )
-            )
-            is AttributionResult.Unattributed -> eventPublisher.publishEvent(
-                AttributionFailed(
-                    conversionEventId = conversionEvent.id,
-                    tenantId = command.tenantId,
-                )
-            )
-        }
+        // 7. 저장
+        attributionDecisionRepository.save(decision)
 
         return decision
     }

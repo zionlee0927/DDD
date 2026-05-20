@@ -1,6 +1,7 @@
 package com.partnercommission.attribution.domain.aggregate
 
 import com.partnercommission.attribution.domain.value.AttributionEvidence
+import com.partnercommission.attribution.domain.value.ConversionEventId
 import com.partnercommission.attribution.domain.value.EvidenceType
 import com.partnercommission.shared.domain.value.Money
 import com.partnercommission.shared.domain.value.TenantId
@@ -9,7 +10,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDateTime
-import java.util.UUID
 
 class ConversionEventTest {
 
@@ -23,9 +23,11 @@ class ConversionEventTest {
             evidence = AttributionEvidence(EvidenceType.CLICK, "click-1"),
         )
 
+        assertThat(event.id).isNotNull()
         assertThat(event.externalId).isEqualTo("order-123")
         assertThat(event.eventType).isEqualTo("PAYMENT")
         assertThat(event.evidence?.type).isEqualTo(EvidenceType.CLICK)
+        assertThat(event.receivedAt).isNotNull()
     }
 
     @Test
@@ -69,7 +71,7 @@ class ConversionEventTest {
 
     @Test
     fun `reconstitute로 복원할 수 있다`() {
-        val id = UUID.randomUUID()
+        val id = ConversionEventId.generate()
         val event = ConversionEvent.reconstitute(
             id = id,
             tenantId = TenantId(),
