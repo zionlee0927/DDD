@@ -10,6 +10,7 @@ services:
       POSTGRES_PASSWORD: partner_commission
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./db/seeds:/docker-entrypoint-initdb.d:ro
 
 volumes:
   pgdata:
