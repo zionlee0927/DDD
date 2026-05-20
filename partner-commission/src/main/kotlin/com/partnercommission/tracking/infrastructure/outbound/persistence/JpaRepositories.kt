@@ -11,4 +11,5 @@ interface ClickJpaRepository : JpaRepository<ClickJpaEntity, UUID>
 
 interface ReferralCodeJpaRepository : JpaRepository<ReferralCodeJpaEntity, UUID> {
     fun findByCode(code: String): ReferralCodeJpaEntity?
+    fun findByTenantIdAndCode(tenantId: UUID, code: String): ReferralCodeJpaEntity?
 }
