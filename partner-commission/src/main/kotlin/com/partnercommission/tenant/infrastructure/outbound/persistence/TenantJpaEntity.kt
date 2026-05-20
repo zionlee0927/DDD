@@ -15,7 +15,7 @@ class TenantJpaEntity(
     val name: String,
     @Enumerated(EnumType.STRING) val status: TenantStatus,
     val attributionWindowMinutes: Long,
-    @Enumerated(EnumType.STRING) val attributionStrategy: AttributionStrategy,
+    @Enumerated(EnumType.STRING) val attributionStrategy: AttributionStrategyOption,
     @Enumerated(EnumType.STRING) val confirmationCondition: ConfirmationCondition,
     val confirmationDays: Int,
     val webhookUrl: String?,
