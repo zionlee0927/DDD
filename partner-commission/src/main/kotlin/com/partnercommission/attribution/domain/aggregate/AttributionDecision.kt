@@ -23,7 +23,7 @@ class AttributionDecision private constructor(
     val strategy: AttributionStrategy,
     private var status: AttributionStatus,
     val decidedAt: LocalDateTime,
-    private val amount: Money,
+    val amount: Money,
 ) : AggregateRoot<AttributionDecisionId>(id) {
 
     fun currentStatus(): AttributionStatus = status
