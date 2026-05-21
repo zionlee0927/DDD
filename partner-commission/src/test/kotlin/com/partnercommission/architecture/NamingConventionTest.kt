@@ -26,6 +26,7 @@ class NamingConventionTest {
     fun `Application Service는 Service로 끝나야 한다`() {
         classes()
             .that().resideInAPackage("..application.service..")
+            .and().resideOutsideOfPackage("..application.service.processor..")
             .and().areNotInterfaces()
             .and().areNotMemberClasses()
             .and().areNotAnonymousClasses()

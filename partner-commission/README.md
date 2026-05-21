@@ -51,3 +51,58 @@
 | 5 | [불변식](./docs/05-invariants.md) | 불변 규칙 |
 | 6 | [Aggregate](./docs/06-aggregate.md) | Aggregate 설계 |
 | 7 | [Context Mapping](./docs/07-context-mapping.md) | BC 간 통신 |
+
+## 아키텍처
+
+### Hexagonal Architecture
+
+```
+Infrastructure(Adapter) → Application → Domain
+```
+ㄹ
+### BC 간 참조 규칙
+
+```
+domain/        → 타 BC 전면 금지 (shared만 허용)
+application/   → 타 BC 전면 금지 (port/out으로 격리)
+infrastructure/out/acl/ → C-S 관계 BC의 value + ReadRepository만 허용
+```
+
+타 BC 데이터가 필요하면:
+1. `application/port/out/`에 인터페이스 정의
+2. `infrastructure/out/acl/`에서 타 BC ReadRepository 호출 + 자기 BC VO로 번역
+
+### ArchUnit 아키텍처 테스트
+
+| 테스트 | 검증 내용 |
+|--------|-----------|
+| HexagonalArchitectureTest | Domain → Application → Infrastructure 레이어 의존 방향 |
+| LayerDependencyTest | Domain이 Spring/JPA에 의존하지 않음 |
+| ModuleBoundaryTest | BC 간 참조 규칙 (domain/application 타 BC 금지, infrastructure ACL만 허용) |
+| NamingConventionTest | UseCase, Service, Controller, JpaEntity 등 네이밍 규칙 |
+
+### Attribution BC 구조
+
+```
+attribution/
+├── domain/                     # 순수 (타 BC 의존 0)
+│   ├── aggregate/              # AttributionDecision, ConversionEvent
+│   ├── value/                  # Evidence, Config, Result, EvidenceData, Ids
+│   ├── service/                # AttributionJudges, AttributionDecisionFactory
+│   ├── event/                  # AttributionDecided, AttributionFailed, AttributionRevoked
+│   ├── exception/              # sealed class AttributionException
+│   └── repository/             # ConversionEventRepository, AttributionDecisionRepository
+├── application/                # 오케스트레이션 (타 BC 의존 0)
+│   ├── port/in/                # ReceiveConversionUseCase + Command
+│   ├── port/out/               # LoadTenantConfigPort, LoadClickPort, LoadReferralCodePort
+│   └── service/
+│       ├── ReceiveConversionFacadeService.kt
+│       └── processor/          # ClickAttributionProcessor, ReferralCodeAttributionProcessor
+└── infrastructure/
+    ├── in/web/                 # REST Controller
+    └── out/
+        ├── acl/                # ACL 어댑터 (타 BC 번역)
+        │   ├── TenantConfigAdapter.kt
+        │   └── TrackingDataAdapter.kt
+        └── persistence/        # JPA Entity, RepositoryImpl, 이벤트 발행
+```

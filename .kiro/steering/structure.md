@@ -23,19 +23,22 @@ com.partnercommission/
 │   │   └── exception/                 # Domain Exceptions
 │   ├── application/                   # 애플리케이션 레이어
 │   │   ├── port/
-│   │   │   ├── in/                    # Inbound Port (UseCase 인터페이스)
+│   │   │   ├── in/                    # Inbound Port (UseCase 인터페이스 + Command)
 │   │   │   └── out/                   # Outbound Port (외부 시스템 인터페이스)
-│   │   ├── service/                   # UseCase 구현체 (suffix: Service)
-│   │   └── command/                   # Command DTOs
+│   │   └── service/                   # UseCase 구현체 (suffix: Service)
+│   │       └── processor/             # 전략 패턴 구현체 (suffix: Processor)
 │   └── infrastructure/                # 인프라 레이어 (Adapter)
 │       ├── in/web/                    # Inbound Adapter
 │       │   ├── {BC}Controller.kt      # REST Controller
 │       │   ├── request/               # Request DTOs
 │       │   └── response/              # Response DTOs
-│       └── out/persistence/           # Outbound Adapter
-│           ├── {Root}JpaEntity.kt
-│           ├── {Root}JpaRepository.kt
-│           └── {Root}RepositoryImpl.kt
+│       └── out/
+│           ├── persistence/           # 자기 BC 영속성
+│           │   ├── {Root}JpaEntity.kt
+│           │   ├── {Root}JpaRepository.kt
+│           │   └── {Root}RepositoryImpl.kt
+│           └── acl/                   # 타 BC 번역 어댑터
+│               └── {Target}Adapter.kt
 └── shared/
     └── domain/
         └── value/                     # 공통 VO (Money, TenantId, PartnerId)
@@ -78,15 +81,16 @@ com.partnercommission/
 
 ### BC 간 참조 규칙
 
-| 레이어 | 타 BC 허용 | 타 BC 금지 |
-|--------|-----------|-----------|
-| `domain/aggregate/`, `domain/value/` | 없음 | 전부 (shared만 사용 가능) |
-| `domain/service/` | aggregate, value, event | repository, service, exception, application, infrastructure |
-| `application/` | repository, event | aggregate, value, service, exception, application, infrastructure |
-| `infrastructure/` | 없음 | 전부 (자기 BC만 참조) |
+| 레이어 | 타 BC 참조 |
+|--------|-----------|
+| `domain/` | **전면 금지** (shared만 허용) |
+| `application/` | **전면 금지** (port/out으로 격리) |
+| `infrastructure/out/acl/` | C-S 관계 BC의 value + ReadRepository만 허용 |
 
-- Domain Service는 타 BC의 도메인 객체를 파라미터로 받을 수 있지만, Repository를 직접 가지지 않는다
-- 타 BC 데이터 조회는 Application Service에서 수행하고, Domain Service에 전달한다
+- Domain과 Application은 타 BC를 일절 참조하지 않는다
+- 타 BC 데이터가 필요하면 `application/port/out/` 인터페이스를 정의하고, `infrastructure/out/acl/` Adapter에서 구현한다
+- ACL Adapter가 타 BC ReadRepository를 호출하고, 자기 BC의 VO로 번역하여 반환한다
+- ReadRepository는 Aggregate가 아닌 View(VO)를 반환한다
 - 이벤트 리스너는 application/service/에 위치한다
 - shared/domain/value/ 는 모든 BC에서 사용 가능
 
@@ -99,14 +103,15 @@ com.partnercommission/
 | Domain Service | 도메인 명사 | `{bc}/domain/service/` |
 | Repository 인터페이스 | `*Repository` | `{bc}/domain/repository/` |
 | UseCase 인터페이스 | `*UseCase` | `{bc}/application/port/in/` |
-| UseCase 구현체 | `*Service` | `{bc}/application/service/` |
+| UseCase 구현체 | `*FacadeService` 또는 `*Service` | `{bc}/application/service/` |
+| Processor | `*Processor` | `{bc}/application/service/processor/` |
+| Command | `*Command` | `{bc}/application/port/in/` (UseCase와 함께) |
 | Controller | `*Controller` | `{bc}/infrastructure/in/web/` |
 | JPA Entity | `*JpaEntity` | `{bc}/infrastructure/out/persistence/` |
 | JPA Repository | `*JpaRepository` | `{bc}/infrastructure/out/persistence/` |
 | Repository 구현체 | `*RepositoryImpl` | `{bc}/infrastructure/out/persistence/` |
 | Domain Event | 과거분사 (`*Calculated`, `*Decided`) | `{bc}/domain/event/` |
 | Domain Exception | `*Exception` (sealed class 하위) | `{bc}/domain/exception/` |
-| Command | `*Command` | `{bc}/application/command/` |
 
 ### JPA Entity Rules
 
