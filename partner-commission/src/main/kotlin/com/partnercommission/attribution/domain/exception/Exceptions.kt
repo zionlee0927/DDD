@@ -16,3 +16,9 @@ class EvidenceRequiredException :
 
 class UnsupportedEvidenceTypeException(type: EvidenceType) :
     AttributionException("지원하지 않는 증거 타입: $type")
+
+class RevocationWindowExpiredException(windowDays: Int) :
+    AttributionException("철회 기한(${windowDays}일)이 초과되었습니다")
+
+class AttributionNotFoundException(externalId: String) :
+    AttributionException("귀속 판정을 찾을 수 없습니다: $externalId")

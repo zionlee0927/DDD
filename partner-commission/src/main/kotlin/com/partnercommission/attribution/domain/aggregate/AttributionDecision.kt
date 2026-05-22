@@ -28,8 +28,11 @@ class AttributionDecision private constructor(
 
     fun currentStatus(): AttributionStatus = status
 
-    fun revoke() {
+    fun revoke(now: LocalDateTime, revocationWindowDays: Int) {
         check(status == AttributionStatus.ATTRIBUTED) { "ATTRIBUTED 상태에서만 철회 가능" }
+        require(decidedAt.plusDays(revocationWindowDays.toLong()) >= now) {
+            "철회 기한(${revocationWindowDays}일)이 초과되었습니다"
+        }
         status = AttributionStatus.REVOKED
         registerEvent(
             AttributionRevoked(

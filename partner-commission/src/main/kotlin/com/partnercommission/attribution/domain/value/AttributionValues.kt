@@ -41,6 +41,7 @@ data class AttributionEvidence(
 data class AttributionConfig(
     val attributionWindow: Duration,
     val strategy: AttributionStrategy,
+    val revocationWindowDays: Int = 30,
 )
 
 sealed class AttributionResult {

@@ -13,4 +13,5 @@ data class ProgramConfig(
     val confirmationDays: Int = 14,
     val commissionRuleType: CommissionRuleType = CommissionRuleType.PERCENTAGE,
     val commissionRuleValue: java.math.BigDecimal = java.math.BigDecimal("10"),
+    val revocationWindowDays: Int = 30,
 )

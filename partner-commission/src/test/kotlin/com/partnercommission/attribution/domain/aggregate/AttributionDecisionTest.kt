@@ -65,7 +65,7 @@ class AttributionDecisionTest {
         )
         decision.getAndClearDomainEvents()
 
-        decision.revoke()
+        decision.revoke(LocalDateTime.now(), 30)
 
         assertThat(decision.currentStatus()).isEqualTo(AttributionStatus.REVOKED)
         assertThat(decision.getAndClearDomainEvents()).hasSize(1)
@@ -79,7 +79,7 @@ class AttributionDecisionTest {
             strategy = AttributionStrategy.LAST_CLICK,
         )
 
-        assertThatThrownBy { decision.revoke() }
+        assertThatThrownBy { decision.revoke(LocalDateTime.now(), 30) }
             .isInstanceOf(IllegalStateException::class.java)
     }
 
@@ -93,10 +93,29 @@ class AttributionDecisionTest {
             strategy = AttributionStrategy.LAST_CLICK,
             amount = Money(BigDecimal("50000")),
         )
-        decision.revoke()
+        decision.revoke(LocalDateTime.now(), 30)
 
-        assertThatThrownBy { decision.revoke() }
+        assertThatThrownBy { decision.revoke(LocalDateTime.now(), 30) }
             .isInstanceOf(IllegalStateException::class.java)
+    }
+
+    @Test
+    fun `철회 기한 초과 시 실패한다`() {
+        val decision = AttributionDecision.reconstitute(
+            id = AttributionDecisionId.generate(),
+            tenantId = tenantId,
+            conversionEventId = conversionEventId,
+            partnerId = partnerId,
+            evidence = evidence,
+            strategy = AttributionStrategy.LAST_CLICK,
+            status = AttributionStatus.ATTRIBUTED,
+            decidedAt = LocalDateTime.now().minusDays(31),
+            amount = Money(BigDecimal("50000")),
+        )
+
+        assertThatThrownBy { decision.revoke(LocalDateTime.now(), 30) }
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessageContaining("기한")
     }
 
     @Test

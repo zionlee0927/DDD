@@ -19,6 +19,7 @@ class TenantConfigAdapter(
         return AttributionConfig(
             attributionWindow = programConfig.attributionWindow,
             strategy = AttributionStrategy.valueOf(programConfig.attributionStrategy.name),
+            revocationWindowDays = programConfig.revocationWindowDays,
         )
     }
 }

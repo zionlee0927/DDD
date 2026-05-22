@@ -2,6 +2,8 @@ package com.partnercommission.integration.framework
 
 import com.partnercommission.attribution.application.port.`in`.ReceiveConversionCommand
 import com.partnercommission.attribution.application.port.`in`.ReceiveConversionUseCase
+import com.partnercommission.attribution.application.port.`in`.RevokeAttributionCommand
+import com.partnercommission.attribution.application.port.`in`.RevokeAttributionUseCase
 import com.partnercommission.attribution.domain.aggregate.AttributionDecision
 import com.partnercommission.shared.domain.value.PartnerId
 import com.partnercommission.shared.domain.value.TenantId
@@ -31,6 +33,7 @@ data class AttributionFlowResult(
 class AttributionFlowExecutor(
     private val createTrackingLink: CreateTrackingLinkUseCase,
     private val receiveConversion: ReceiveConversionUseCase,
+    private val revokeAttribution: RevokeAttributionUseCase,
     private val clickRepository: ClickRepository,
 ) {
     /** 전체 흐름: 링크 발급 → 클릭 → 전환 수신 */
@@ -83,6 +86,13 @@ class AttributionFlowExecutor(
                 clickId = clickId,
                 referralCode = referralCode,
             )
+        )
+    }
+
+    /** 귀속 철회 */
+    fun executeRevoke(ctx: AttributionScenarioContext): AttributionDecision {
+        return revokeAttribution.execute(
+            RevokeAttributionCommand(tenantId = ctx.tenantId, externalId = ctx.externalId)
         )
     }
 }
