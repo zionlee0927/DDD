@@ -25,8 +25,9 @@ com.partnercommission/
 │   │   ├── port/
 │   │   │   ├── in/                    # Inbound Port (UseCase 인터페이스 + Command)
 │   │   │   └── out/                   # Outbound Port (외부 시스템 인터페이스)
-│   │   └── service/                   # UseCase 구현체 (suffix: Service)
-│   │       └── processor/             # 전략 패턴 구현체 (suffix: Processor)
+│   │   ├── service/                   # UseCase 구현체 (suffix: Service)
+│   │   │   └── processor/             # 전략 패턴 구현체 (suffix: Processor)
+│   │   └── listener/                  # 이벤트 리스너 (suffix: Listener)
 │   └── infrastructure/                # 인프라 레이어 (Adapter)
 │       ├── in/web/                    # Inbound Adapter
 │       │   ├── {BC}Controller.kt      # REST Controller
@@ -91,7 +92,8 @@ com.partnercommission/
 - 타 BC 데이터가 필요하면 `application/port/out/` 인터페이스를 정의하고, `infrastructure/out/acl/` Adapter에서 구현한다
 - ACL Adapter가 타 BC ReadRepository를 호출하고, 자기 BC의 VO로 번역하여 반환한다
 - ReadRepository는 Aggregate가 아닌 View(VO)를 반환한다
-- 이벤트 리스너는 application/service/에 위치한다
+- 이벤트 리스너는 application/listener/에 위치한다
+- 이벤트 리스너는 타 BC의 domain/event만 참조 가능 (Events 관계)
 - shared/domain/value/ 는 모든 BC에서 사용 가능
 
 ### Naming Conventions
@@ -105,6 +107,7 @@ com.partnercommission/
 | UseCase 인터페이스 | `*UseCase` | `{bc}/application/port/in/` |
 | UseCase 구현체 | `*FacadeService` 또는 `*Service` | `{bc}/application/service/` |
 | Processor | `*Processor` | `{bc}/application/service/processor/` |
+| Listener | `*Listener` | `{bc}/application/listener/` |
 | Command | `*Command` | `{bc}/application/port/in/` (UseCase와 함께) |
 | Controller | `*Controller` | `{bc}/infrastructure/in/web/` |
 | JPA Entity | `*JpaEntity` | `{bc}/infrastructure/out/persistence/` |
@@ -130,10 +133,18 @@ com.partnercommission/
 ```
 src/test/kotlin/com/partnercommission/
 ├── architecture/            # ArchUnit 아키텍처 테스트
+├── integration/             # 통합 테스트 (@Tag("integration"))
+│   ├── framework/           # BaseIntegrationTest, FlowExecutor, DbVerifier
+│   └── scenario/            # 축 기반 시나리오 테스트
 ├── {bc}/
 │   ├── domain/              # Domain 단위 테스트
-│   │   └── fixture/         # Test Fixture (object)
-│   ├── application/         # Use Case 테스트
-│   └── infrastructure/      # 통합 테스트
+│   └── application/         # Use Case 단위 테스트 (MockK)
 └── shared/
 ```
+
+## Domain Event
+
+- `DomainEvent` 인터페이스: `eventId: UUID`, `occurredAt: LocalDateTime`
+- Aggregate 내부에서 `registerEvent()` 호출
+- RepositoryImpl에서 save 후 `getAndClearDomainEvents()` → `ApplicationEventPublisher` 발행
+- 이벤트 리스너: `@Async @TransactionalEventListener(phase = AFTER_COMMIT)` + `@Transactional(REQUIRES_NEW)`
