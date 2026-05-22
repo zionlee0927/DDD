@@ -63,7 +63,7 @@ curl -s -X POST "$BASE_URL/api/attributions/conversions" \
 DUP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "$BASE_URL/api/attributions/conversions" \
   -H "Content-Type: application/json" \
   -d "{\"tenantId\":\"$TENANT_ID\",\"externalId\":\"e2e-dup-test\",\"amount\":50000,\"eventType\":\"PAYMENT\",\"clickId\":\"$CLICK_ID\",\"referralCode\":null}")
-assert_eq "$DUP_STATUS" "500" "중복 거부"
+assert_eq "$DUP_STATUS" "409" "중복 거부 (409)"
 
 echo "=== 6. 추천코드 기반 전환 ==="
 REF_RESP=$(curl -s -X POST "$BASE_URL/api/attributions/conversions" \
