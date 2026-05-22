@@ -1,0 +1,38 @@
+### 전환 수신 (클릭 기반)
+POST http://localhost:8080/api/attributions/conversions
+Content-Type: application/json
+
+{
+  "tenantId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "externalId": "order-001",
+  "amount": 50000,
+  "eventType": "PAYMENT",
+  "clickId": "{{clickId}}",
+  "referralCode": null
+}
+
+### 전환 수신 (추천코드 기반)
+POST http://localhost:8080/api/attributions/conversions
+Content-Type: application/json
+
+{
+  "tenantId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "externalId": "order-002",
+  "amount": 30000,
+  "eventType": "PAYMENT",
+  "clickId": null,
+  "referralCode": "JISOO10"
+}
+
+### 전환 수신 (중복 테스트 — 같은 externalId)
+POST http://localhost:8080/api/attributions/conversions
+Content-Type: application/json
+
+{
+  "tenantId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "externalId": "order-001",
+  "amount": 50000,
+  "eventType": "PAYMENT",
+  "clickId": "{{clickId}}",
+  "referralCode": null
+}

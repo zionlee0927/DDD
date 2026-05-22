@@ -1,0 +1,22 @@
+### 추적 링크 발급
+POST http://localhost:8080/api/tracking-links
+Content-Type: application/json
+
+{
+  "tenantId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "partnerId": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "targetUrl": "https://demo-shop.com/product/1"
+}
+
+### 클릭 리다이렉트
+GET http://localhost:8080/api/redirect/{{trackingCode}}
+
+### 추천 코드 발급
+POST http://localhost:8080/api/referral-codes
+Content-Type: application/json
+
+{
+  "tenantId": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "partnerId": "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+  "code": "JISOO10"
+}

@@ -1,0 +1,7 @@
+### 테넌트 생성
+POST http://localhost:8080/api/tenants
+Content-Type: application/json
+
+{
+  "name": "새 쇼핑몰"
+}

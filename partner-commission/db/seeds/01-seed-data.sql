@@ -17,3 +17,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO memberships (id, partner_id, tenant_id, tier_level, commission_rate, status, joined_at)
 VALUES ('d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'GOLD', 10.00, 'ACTIVE', NOW())
 ON CONFLICT (id) DO NOTHING;
+
+-- 추천 코드
+INSERT INTO referral_codes (id, tenant_id, partner_id, code, created_at, expires_at)
+VALUES ('00000000-0000-0000-0000-000000000040', 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'DEMO10', NOW(), NULL)
+ON CONFLICT (id) DO NOTHING;
