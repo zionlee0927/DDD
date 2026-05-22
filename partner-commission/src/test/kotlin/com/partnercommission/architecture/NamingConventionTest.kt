@@ -38,8 +38,10 @@ class NamingConventionTest {
     @Test
     fun `Controller는 Controller로 끝나야 한다`() {
         classes()
-            .that().resideInAPackage("..infrastructure.inbound.web..")
+            .that().resideInAPackage("..infrastructure.in.web..")
             .and().areNotMemberClasses()
+            .and().haveSimpleNameNotEndingWith("Request")
+            .and().haveSimpleNameNotEndingWith("Response")
             .should().haveSimpleNameEndingWith("Controller")
             .because("Web Controller는 Controller로 끝나야 함")
             .check(classes)
@@ -48,7 +50,7 @@ class NamingConventionTest {
     @Test
     fun `JPA Entity는 JpaEntity로 끝나야 한다`() {
         classes()
-            .that().resideInAPackage("..infrastructure.outbound.persistence..")
+            .that().resideInAPackage("..infrastructure.out.persistence..")
             .and().haveSimpleNameContaining("Entity")
             .should().haveSimpleNameEndingWith("JpaEntity")
             .because("JPA Entity는 JpaEntity로 끝나야 함")
@@ -58,7 +60,7 @@ class NamingConventionTest {
     @Test
     fun `JPA Repository는 JpaRepository로 끝나야 한다`() {
         classes()
-            .that().resideInAPackage("..infrastructure.outbound.persistence..")
+            .that().resideInAPackage("..infrastructure.out.persistence..")
             .and().areInterfaces()
             .and().haveSimpleNameContaining("Repository")
             .should().haveSimpleNameEndingWith("JpaRepository")
@@ -69,7 +71,7 @@ class NamingConventionTest {
     @Test
     fun `Repository 구현체는 RepositoryImpl로 끝나야 한다`() {
         classes()
-            .that().resideInAPackage("..infrastructure.outbound.persistence..")
+            .that().resideInAPackage("..infrastructure.out.persistence..")
             .and().haveSimpleNameContaining("Repository")
             .and().areNotInterfaces()
             .should().haveSimpleNameEndingWith("RepositoryImpl")

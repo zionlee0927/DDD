@@ -1,4 +1,4 @@
-package com.partnercommission.tenant.infrastructure.inbound.web
+package com.partnercommission.tenant.infrastructure.`in`.web
 
 import com.partnercommission.shared.domain.value.TenantId
 import com.partnercommission.tenant.application.port.`in`.IssueApiKeyUseCase

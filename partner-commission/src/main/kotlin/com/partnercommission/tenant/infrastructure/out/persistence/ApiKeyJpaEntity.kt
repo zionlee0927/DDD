@@ -1,4 +1,4 @@
-package com.partnercommission.tenant.infrastructure.outbound.persistence
+package com.partnercommission.tenant.infrastructure.out.persistence
 
 import com.partnercommission.shared.domain.value.TenantId
 import com.partnercommission.tenant.domain.aggregate.ApiKey

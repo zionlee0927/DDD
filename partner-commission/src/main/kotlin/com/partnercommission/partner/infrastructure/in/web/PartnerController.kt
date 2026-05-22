@@ -1,4 +1,4 @@
-package com.partnercommission.partner.infrastructure.inbound.web
+package com.partnercommission.partner.infrastructure.`in`.web
 
 import com.partnercommission.partner.application.port.`in`.JoinProgramUseCase
 import com.partnercommission.partner.application.port.`in`.RegisterPartnerUseCase

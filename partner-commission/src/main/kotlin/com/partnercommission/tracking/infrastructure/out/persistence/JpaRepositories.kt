@@ -1,4 +1,4 @@
-package com.partnercommission.tracking.infrastructure.outbound.persistence
+package com.partnercommission.tracking.infrastructure.out.persistence
 
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID

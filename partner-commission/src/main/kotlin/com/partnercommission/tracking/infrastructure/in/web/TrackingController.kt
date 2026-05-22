@@ -1,4 +1,4 @@
-package com.partnercommission.tracking.infrastructure.inbound.web
+package com.partnercommission.tracking.infrastructure.`in`.web
 
 import com.partnercommission.shared.domain.value.PartnerId
 import com.partnercommission.shared.domain.value.TenantId

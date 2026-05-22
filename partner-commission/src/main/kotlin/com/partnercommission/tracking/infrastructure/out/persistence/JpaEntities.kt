@@ -1,4 +1,4 @@
-package com.partnercommission.tracking.infrastructure.outbound.persistence
+package com.partnercommission.tracking.infrastructure.out.persistence
 
 import com.partnercommission.shared.domain.value.PartnerId
 import com.partnercommission.shared.domain.value.TenantId

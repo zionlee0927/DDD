@@ -1,4 +1,4 @@
-package com.partnercommission.partner.infrastructure.outbound.persistence
+package com.partnercommission.partner.infrastructure.out.persistence
 
 import com.partnercommission.partner.domain.aggregate.Partner
 import com.partnercommission.partner.domain.repository.PartnerRepository
