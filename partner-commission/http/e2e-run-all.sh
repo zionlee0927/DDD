@@ -3,7 +3,7 @@
 DIR="$(dirname "$0")"
 TOTAL_PASS=0; TOTAL_FAIL=0
 
-for script in "$DIR"/e2e-attribute.sh "$DIR"/e2e-revoke.sh "$DIR"/e2e-reject-duplicate.sh; do
+for script in "$DIR"/e2e-attribute.sh "$DIR"/e2e-confirm.sh "$DIR"/e2e-revoke.sh "$DIR"/e2e-reject-duplicate.sh; do
   echo ""
   bash "$script"
   [ $? -ne 0 ] && TOTAL_FAIL=$((TOTAL_FAIL+1)) || TOTAL_PASS=$((TOTAL_PASS+1))
