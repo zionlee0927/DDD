@@ -15,13 +15,13 @@ abstract class Entity<ID>(val id: ID) {
 abstract class AggregateRoot<ID>(id: ID) : Entity<ID>(id) {
 
     @Transient
-    private val domainEvents: MutableList<Any> = mutableListOf()
+    private val domainEvents: MutableList<DomainEvent> = mutableListOf()
 
-    protected fun registerEvent(event: Any) {
+    protected fun registerEvent(event: DomainEvent) {
         domainEvents.add(event)
     }
 
-    fun getAndClearDomainEvents(): List<Any> {
+    fun getAndClearDomainEvents(): List<DomainEvent> {
         val events = domainEvents.toList()
         domainEvents.clear()
         return events
