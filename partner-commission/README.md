@@ -43,14 +43,14 @@
 
 | # | 단계 | 산출물 |
 |---|------|--------|
-| 0 | [서브도메인 분석](./docs/00-subdomain.md) | 문제 공간 분해 |
-| 1 | [유비쿼터스 언어](./docs/01-ubiquitous-language.md) | BC별 용어집 |
-| 2 | [Event Storming](./docs/02-event-storming.md) | 이벤트, 커맨드, 정책 |
-| 3 | [Bounded Context](./docs/03-bounded-context.md) | BC 경계 |
-| 4 | [Entity / VO](./docs/04-entity-vo.md) | Entity, Value Object |
-| 5 | [불변식](./docs/05-invariants.md) | 불변 규칙 |
-| 6 | [Aggregate](./docs/06-aggregate.md) | Aggregate 설계 |
-| 7 | [Context Mapping](./docs/07-context-mapping.md) | BC 간 통신 |
+| 0 | [서브도메인 분석](./docs/design/00-subdomain.md) | 문제 공간 분해 |
+| 1 | [유비쿼터스 언어](./docs/design/01-ubiquitous-language.md) | BC별 용어집 |
+| 2 | [Event Storming](./docs/design/02-event-storming.md) | 이벤트, 커맨드, 정책 |
+| 3 | [Bounded Context](./docs/design/03-bounded-context.md) | BC 경계 |
+| 4 | [Entity / VO](./docs/design/04-entity-vo.md) | Entity, Value Object |
+| 5 | [불변식](./docs/design/05-invariants.md) | 불변 규칙 |
+| 6 | [Aggregate](./docs/design/06-aggregate.md) | Aggregate 설계 |
+| 7 | [Context Mapping](./docs/design/07-context-mapping.md) | BC 간 통신 |
 
 ## 아키텍처
 
