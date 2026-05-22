@@ -19,7 +19,7 @@ class ModuleBoundaryTest {
     // Context Mapping (07-context-mapping.md) 기반
     private val allowedDependencies: Map<String, AllowedAccess> = mapOf(
         "attribution" to AllowedAccess(cs = setOf("tracking", "tenant")),
-        "commission" to AllowedAccess(events = setOf("attribution")),
+        "commission" to AllowedAccess(cs = setOf("tenant"), events = setOf("attribution")),
         "statement" to AllowedAccess(events = setOf("commission")),
         "tracking" to AllowedAccess(),
         "partner" to AllowedAccess(),
@@ -51,21 +51,47 @@ class ModuleBoundaryTest {
 
     // ==================== application ====================
     // 타 BC 전부 금지 (타 BC 접근은 port/out → infrastructure adapter에서)
+    // 예외: 이벤트 리스너는 타 BC의 domain/event 참조 허용
 
     @Test
     fun `BC의 application은 다른 BC를 참조하지 않는다`() {
         for (bc in allBcs) {
-            noClasses()
-                .that().resideInAPackage("..${bc}.application..")
-                .should().dependOnClassesThat()
-                .resideInAnyPackage(
-                    *allBcs.filter { it != bc }.flatMap { other ->
-                        listOf("..${other}.domain..", "..${other}.application..", "..${other}.infrastructure..")
-                    }.toTypedArray()
-                )
-                .because("$bc application은 다른 BC를 참조하지 않는다 (port/out으로 격리)")
-                .allowEmptyShould(true)
-                .check(classes)
+            val access = allowedDependencies[bc] ?: AllowedAccess()
+
+            // 이벤트 구독 관계가 아닌 BC는 전면 금지
+            val forbidden = allBcs.filter { it != bc && it !in access.events }
+            if (forbidden.isNotEmpty()) {
+                noClasses()
+                    .that().resideInAPackage("..${bc}.application..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage(
+                        *forbidden.flatMap { other ->
+                            listOf("..${other}.domain..", "..${other}.application..", "..${other}.infrastructure..")
+                        }.toTypedArray()
+                    )
+                    .because("$bc application은 다른 BC를 참조하지 않는다 (port/out으로 격리)")
+                    .allowEmptyShould(true)
+                    .check(classes)
+            }
+
+            // 이벤트 구독 관계 BC — domain/event만 허용
+            for (eventBc in access.events) {
+                noClasses()
+                    .that().resideInAPackage("..${bc}.application..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage(
+                        "..${eventBc}.domain.aggregate..",
+                        "..${eventBc}.domain.value..",
+                        "..${eventBc}.domain.repository..",
+                        "..${eventBc}.domain.service..",
+                        "..${eventBc}.domain.exception..",
+                        "..${eventBc}.application..",
+                        "..${eventBc}.infrastructure..",
+                    )
+                    .because("$bc application은 $eventBc 의 domain/event만 참조 가능 (이벤트 구독)")
+                    .allowEmptyShould(true)
+                    .check(classes)
+            }
         }
     }
 
