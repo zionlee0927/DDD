@@ -2,6 +2,7 @@ package com.partnercommission.commission.domain.aggregate
 
 import com.partnercommission.commission.domain.event.CommissionCalculated
 import com.partnercommission.commission.domain.event.CommissionCancelled
+import com.partnercommission.commission.domain.event.CommissionConfirmed
 import com.partnercommission.commission.domain.value.CommissionId
 import com.partnercommission.commission.domain.value.CommissionRule
 import com.partnercommission.commission.domain.value.CommissionStatus
@@ -33,6 +34,7 @@ class Commission private constructor(
     fun confirm() {
         check(status == CommissionStatus.PENDING) { "PENDING 상태에서만 확정 가능" }
         status = CommissionStatus.CONFIRMED
+        registerEvent(CommissionConfirmed(commissionId = id, tenantId = tenantId, partnerId = partnerId, amount = amount))
     }
 
     companion object {

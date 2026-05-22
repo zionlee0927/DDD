@@ -77,6 +77,9 @@ tasks.jacocoTestCoverageVerification {
                 "com.partnercommission.attribution.domain.aggregate.*",
                 "com.partnercommission.attribution.domain.service.*",
                 "com.partnercommission.attribution.application.service.*",
+                "com.partnercommission.commission.domain.aggregate.*",
+                "com.partnercommission.commission.domain.service.*",
+                "com.partnercommission.commission.application.service.*",
             )
             limit {
                 minimum = 0.8.toBigDecimal()

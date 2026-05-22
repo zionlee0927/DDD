@@ -19,3 +19,12 @@ data class CalculateCommissionCommand(
 interface CancelCommissionUseCase {
     fun execute(attributionDecisionId: String)
 }
+
+interface ConfirmCommissionUseCase {
+    fun execute(command: ConfirmCommissionCommand): Commission
+}
+
+data class ConfirmCommissionCommand(
+    val tenantId: TenantId,
+    val attributionDecisionId: String,
+)

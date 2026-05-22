@@ -13,7 +13,7 @@ value class CommissionId(val value: UUID) {
     override fun toString(): String = value.toString()
 }
 
-enum class CommissionStatus { PENDING, CONFIRMED, CANCELLED }
+enum class CommissionStatus { PENDING, CONFIRMED, SETTLED, CANCELLED }
 enum class RuleType { PERCENTAGE, FIXED }
 
 data class CommissionRule(val type: RuleType, val value: BigDecimal) {

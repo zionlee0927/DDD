@@ -24,3 +24,12 @@ data class CommissionCancelled(
     override val eventId: UUID = UUID.randomUUID(),
     override val occurredAt: LocalDateTime = LocalDateTime.now(),
 ) : DomainEvent
+
+data class CommissionConfirmed(
+    val commissionId: CommissionId,
+    val tenantId: TenantId,
+    val partnerId: PartnerId,
+    val amount: Money,
+    override val eventId: UUID = UUID.randomUUID(),
+    override val occurredAt: LocalDateTime = LocalDateTime.now(),
+) : DomainEvent
