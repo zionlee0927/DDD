@@ -1,6 +1,6 @@
 -- 기본 테넌트
-INSERT INTO tenants (id, name, status, attribution_window_minutes, attribution_strategy, confirmation_condition, confirmation_days, created_at)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '테스트 쇼핑몰', 'ACTIVE', 43200, 'LAST_CLICK', 'TIME_BASED', 14, NOW())
+INSERT INTO tenants (id, name, status, attribution_window_minutes, attribution_strategy, confirmation_condition, confirmation_days, commission_rule_type, commission_rule_value, created_at)
+VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', '테스트 쇼핑몰', 'ACTIVE', 43200, 'LAST_CLICK', 'TIME_BASED', 14, 'PERCENTAGE', 10.00, NOW())
 ON CONFLICT (id) DO NOTHING;
 
 -- 기본 API 키

@@ -7,6 +7,8 @@ CREATE TABLE IF NOT EXISTS tenants (
     attribution_strategy VARCHAR(255) DEFAULT 'LAST_CLICK',
     confirmation_condition VARCHAR(255) DEFAULT 'TIME_BASED',
     confirmation_days INT NOT NULL DEFAULT 14,
+    commission_rule_type VARCHAR(30) NOT NULL DEFAULT 'PERCENTAGE',
+    commission_rule_value DECIMAL(19, 2) NOT NULL DEFAULT 10.00,
     webhook_url VARCHAR(255),
     webhook_secret VARCHAR(255),
     created_at TIMESTAMP
@@ -65,4 +67,46 @@ CREATE TABLE IF NOT EXISTS referral_codes (
     code VARCHAR(255) UNIQUE,
     created_at TIMESTAMP,
     expires_at TIMESTAMP
+);
+
+-- Attribution BC
+CREATE TABLE IF NOT EXISTS conversion_events (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    external_id VARCHAR(255) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'KRW',
+    event_type VARCHAR(50) NOT NULL,
+    evidence_type VARCHAR(30),
+    evidence_reference_id VARCHAR(255),
+    received_at TIMESTAMP NOT NULL,
+    UNIQUE (tenant_id, external_id)
+);
+
+CREATE TABLE IF NOT EXISTS attribution_decisions (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    conversion_event_id UUID NOT NULL,
+    partner_id UUID,
+    evidence_type VARCHAR(30),
+    evidence_reference_id VARCHAR(255),
+    strategy VARCHAR(30) NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'KRW',
+    decided_at TIMESTAMP NOT NULL
+);
+
+-- Commission BC
+CREATE TABLE IF NOT EXISTS commissions (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    partner_id UUID NOT NULL,
+    attribution_decision_id VARCHAR(255) NOT NULL,
+    amount DECIMAL(19, 2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'KRW',
+    rule_type VARCHAR(30) NOT NULL,
+    rule_value DECIMAL(19, 2) NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    calculated_at TIMESTAMP NOT NULL
 );
