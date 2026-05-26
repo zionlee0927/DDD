@@ -92,7 +92,7 @@ com.partnercommission/
 - 타 BC 데이터가 필요하면 `application/port/out/` 인터페이스를 정의하고, `infrastructure/out/acl/` Adapter에서 구현한다
 - ACL Adapter가 타 BC ReadRepository를 호출하고, 자기 BC의 VO로 번역하여 반환한다
 - ReadRepository는 Aggregate가 아닌 View(VO)를 반환한다
-- 이벤트 리스너는 application/listener/에 위치한다
+- 이벤트 리스너는 infrastructure/in/event/에 위치한다 (Inbound Adapter)
 - 이벤트 리스너는 타 BC의 domain/event만 참조 가능 (Events 관계)
 - shared/domain/value/ 는 모든 BC에서 사용 가능
 
@@ -107,7 +107,7 @@ com.partnercommission/
 | UseCase 인터페이스 | `*UseCase` | `{bc}/application/port/in/` |
 | UseCase 구현체 | `*FacadeService` 또는 `*Service` | `{bc}/application/service/` |
 | Processor | `*Processor` | `{bc}/application/service/processor/` |
-| Listener | `*Listener` | `{bc}/application/listener/` |
+| Listener | `*Listener` | `{bc}/infrastructure/in/event/` |
 | Command | `*Command` | `{bc}/application/port/in/` (UseCase와 함께) |
 | Controller | `*Controller` | `{bc}/infrastructure/in/web/` |
 | JPA Entity | `*JpaEntity` | `{bc}/infrastructure/out/persistence/` |

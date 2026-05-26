@@ -1,4 +1,4 @@
-package com.partnercommission.commission.application.listener
+package com.partnercommission.commission.infrastructure.`in`.event
 
 import com.partnercommission.attribution.domain.event.AttributionDecided
 import com.partnercommission.attribution.domain.event.AttributionRevoked

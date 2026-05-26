@@ -102,7 +102,7 @@ class ModuleBoundaryTest {
     fun `BC의 infrastructure는 허용되지 않은 BC를 참조하지 않는다`() {
         for (bc in allBcs) {
             val access = allowedDependencies[bc] ?: AllowedAccess()
-            val forbidden = allBcs.filter { it != bc && it !in access.cs }
+            val forbidden = allBcs.filter { it != bc && it !in access.cs && it !in access.events }
 
             // 완전 금지 BC
             if (forbidden.isNotEmpty()) {
@@ -133,6 +133,25 @@ class ModuleBoundaryTest {
                         "..${csBc}.infrastructure..",
                     )
                     .because("$bc infrastructure는 $csBc 의 value/ReadRepository만 참조 가능")
+                    .allowEmptyShould(true)
+                    .check(classes)
+            }
+
+            // Events 관계 BC — domain/event만 허용
+            for (eventBc in access.events) {
+                noClasses()
+                    .that().resideInAPackage("..${bc}.infrastructure..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage(
+                        "..${eventBc}.domain.aggregate..",
+                        "..${eventBc}.domain.value..",
+                        "..${eventBc}.domain.repository..",
+                        "..${eventBc}.domain.service..",
+                        "..${eventBc}.domain.exception..",
+                        "..${eventBc}.application..",
+                        "..${eventBc}.infrastructure..",
+                    )
+                    .because("$bc infrastructure는 $eventBc 의 domain/event만 참조 가능 (이벤트 구독)")
                     .allowEmptyShould(true)
                     .check(classes)
             }
