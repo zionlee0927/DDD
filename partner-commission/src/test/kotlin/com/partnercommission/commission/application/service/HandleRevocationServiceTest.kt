@@ -12,16 +12,17 @@ import com.partnercommission.shared.domain.value.TenantId
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.util.UUID
 
-class CancelCommissionServiceTest {
+class HandleRevocationServiceTest {
 
     private val commissionRepository: CommissionRepository = mockk()
-    private val service = CancelCommissionService(commissionRepository)
+    private val service = HandleRevocationService(commissionRepository)
 
     private val attrId = "attr-1"
 
@@ -34,11 +35,35 @@ class CancelCommissionServiceTest {
     )
 
     @Test
-    fun `정상 취소`() {
+    fun `PENDING → CANCELLED`() {
         val commission = pendingCommission()
         every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
         val saved = slot<Commission>()
         every { commissionRepository.save(capture(saved)) } answers { saved.captured }
+
+        service.execute(attrId)
+
+        assertThat(commission.currentStatus()).isEqualTo(CommissionStatus.CANCELLED)
+        verify { commissionRepository.save(any()) }
+    }
+
+    @Test
+    fun `CONFIRMED → Deduction 생성 예정 (현재 무시)`() {
+        val commission = pendingCommission()
+        commission.confirm()
+        every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
+
+        service.execute(attrId)
+
+        // CONFIRMED 유지, save 호출 안 됨
+        assertThat(commission.currentStatus()).isEqualTo(CommissionStatus.CONFIRMED)
+    }
+
+    @Test
+    fun `CANCELLED → 무시`() {
+        val commission = pendingCommission()
+        commission.cancel()
+        every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
 
         service.execute(attrId)
 
