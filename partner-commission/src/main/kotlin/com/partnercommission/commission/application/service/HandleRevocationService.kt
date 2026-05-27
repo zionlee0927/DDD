@@ -29,6 +29,7 @@ class HandleRevocationService(
                 commissionRepository.save(commission)
             }
             RevocationAction.DEDUCT -> {
+                if (deductionRepository.findByOriginalCommissionId(commission.id) != null) return
                 val deduction = Deduction.create(
                     tenantId = commission.tenantId,
                     partnerId = commission.partnerId,

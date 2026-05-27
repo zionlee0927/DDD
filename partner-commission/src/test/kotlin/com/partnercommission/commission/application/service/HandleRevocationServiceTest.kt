@@ -55,6 +55,7 @@ class HandleRevocationServiceTest {
         val commission = pendingCommission()
         commission.confirm()
         every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
+        every { deductionRepository.findByOriginalCommissionId(commission.id) } returns null
         val saved = slot<Deduction>()
         every { deductionRepository.save(capture(saved)) } answers { saved.captured }
 
@@ -63,6 +64,18 @@ class HandleRevocationServiceTest {
         assertThat(saved.captured.amount.amount).isEqualByComparingTo(BigDecimal("5000"))
         assertThat(saved.captured.originalCommissionId).isEqualTo(commission.id)
         verify { deductionRepository.save(any()) }
+    }
+
+    @Test
+    fun `CONFIRMED + 이미 차감 존재 → 무시`() {
+        val commission = pendingCommission()
+        commission.confirm()
+        every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
+        every { deductionRepository.findByOriginalCommissionId(commission.id) } returns mockk()
+
+        service.execute(attrId)
+
+        verify(exactly = 0) { deductionRepository.save(any()) }
     }
 
     @Test
