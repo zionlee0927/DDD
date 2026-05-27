@@ -110,3 +110,14 @@ CREATE TABLE IF NOT EXISTS commissions (
     status VARCHAR(30) NOT NULL,
     calculated_at TIMESTAMP NOT NULL
 );
+
+-- Deductions
+CREATE TABLE IF NOT EXISTS deductions (
+    id UUID PRIMARY KEY,
+    tenant_id UUID NOT NULL,
+    partner_id UUID NOT NULL,
+    original_commission_id UUID NOT NULL,
+    amount DECIMAL(15,2) NOT NULL,
+    currency VARCHAR(3) NOT NULL DEFAULT 'KRW',
+    created_at TIMESTAMP NOT NULL
+);

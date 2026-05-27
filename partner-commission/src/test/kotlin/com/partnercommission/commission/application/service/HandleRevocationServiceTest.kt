@@ -1,8 +1,10 @@
 package com.partnercommission.commission.application.service
 
 import com.partnercommission.commission.domain.aggregate.Commission
+import com.partnercommission.commission.domain.aggregate.Deduction
 import com.partnercommission.commission.domain.exception.CommissionNotFoundByAttributionException
 import com.partnercommission.commission.domain.repository.CommissionRepository
+import com.partnercommission.commission.domain.repository.DeductionRepository
 import com.partnercommission.commission.domain.value.CommissionRule
 import com.partnercommission.commission.domain.value.CommissionStatus
 import com.partnercommission.commission.domain.value.RuleType
@@ -22,7 +24,8 @@ import java.util.UUID
 class HandleRevocationServiceTest {
 
     private val commissionRepository: CommissionRepository = mockk()
-    private val service = HandleRevocationService(commissionRepository)
+    private val deductionRepository: DeductionRepository = mockk()
+    private val service = HandleRevocationService(commissionRepository, deductionRepository)
 
     private val attrId = "attr-1"
 
@@ -48,15 +51,18 @@ class HandleRevocationServiceTest {
     }
 
     @Test
-    fun `CONFIRMED → Deduction 생성 예정 (현재 무시)`() {
+    fun `CONFIRMED → Deduction 생성`() {
         val commission = pendingCommission()
         commission.confirm()
         every { commissionRepository.findByAttributionDecisionId(attrId) } returns commission
+        val saved = slot<Deduction>()
+        every { deductionRepository.save(capture(saved)) } answers { saved.captured }
 
         service.execute(attrId)
 
-        // CONFIRMED 유지, save 호출 안 됨
-        assertThat(commission.currentStatus()).isEqualTo(CommissionStatus.CONFIRMED)
+        assertThat(saved.captured.amount.amount).isEqualByComparingTo(BigDecimal("5000"))
+        assertThat(saved.captured.originalCommissionId).isEqualTo(commission.id)
+        verify { deductionRepository.save(any()) }
     }
 
     @Test
@@ -67,7 +73,8 @@ class HandleRevocationServiceTest {
 
         service.execute(attrId)
 
-        assertThat(commission.currentStatus()).isEqualTo(CommissionStatus.CANCELLED)
+        verify(exactly = 0) { commissionRepository.save(any()) }
+        verify(exactly = 0) { deductionRepository.save(any()) }
     }
 
     @Test

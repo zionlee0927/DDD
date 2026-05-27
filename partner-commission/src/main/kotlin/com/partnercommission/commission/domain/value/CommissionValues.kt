@@ -13,6 +13,15 @@ value class CommissionId(val value: UUID) {
     override fun toString(): String = value.toString()
 }
 
+@JvmInline
+value class DeductionId(val value: UUID) {
+    companion object {
+        fun generate(): DeductionId = DeductionId(UUID.randomUUID())
+    }
+
+    override fun toString(): String = value.toString()
+}
+
 enum class CommissionStatus { PENDING, CONFIRMED, SETTLED, CANCELLED }
 enum class RuleType { PERCENTAGE, FIXED }
 
